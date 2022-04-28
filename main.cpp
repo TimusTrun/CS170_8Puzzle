@@ -103,9 +103,10 @@ int euclideanDistanceHeur(vector<vector<int>> board){ //returning h(n) based on 
             euclDist += sqrt((xVal*xVal) + (yVal*yVal)); //sqrt(x^2 + y^2)
         }
     }
+    return euclDist;
 }
 
-void performSearch(vector<vector<int>> board, int h){ //1 = uni, 2 = misplaced, 3 = euclidean, h = heuristic val
+void performSearch(vector<vector<int>> board, double h){ //1 = uni, 2 = misplaced, 3 = euclidean, h = heuristic val
 
 }
 
