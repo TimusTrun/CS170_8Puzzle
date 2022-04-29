@@ -1,12 +1,10 @@
-using namespace std;
 #include "main.h"
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <queue>
+
+int expandedNodes = 0; //keeps track of the amount of puzzleNodes expanded
 
 void printGoalState(puzzleNode* node){
-    cout<< "We found the goal state!";
+    cout<< "\nWe found the goal state!\nThe depth is " << node->cost << "!\n";
+    cout<< "We also expanded " << expandedNodes << " nodes!\n";
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 3; j++){
             cout << node->currState[i][j];
@@ -15,18 +13,28 @@ void printGoalState(puzzleNode* node){
     }
 }
 
+void printCurrent(puzzleNode* node){
+    cout<< "\nThis is the current state we are at.\n";
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            cout << node->currState[i][j];
+        }
+        cout <<"\n";
+    }
+    cout<< "This state's current depth is " << node->cost << " with a heuristic cost of " << node->heurVal << endl;
+}
+
 bool solvedPuzzle(vector<vector<int>> board){
     vector<vector<int>> goalBoard;
-    goalBoard[0][0] = 1;
-    goalBoard[0][1] = 2;
-    goalBoard[0][2] = 3;
-    goalBoard[1][0] = 4; // 1 2 3
-    goalBoard[1][1] = 5; // 4 5 6
-    goalBoard[1][2] = 6; // 7 8 0
-    goalBoard[2][0] = 7;
-    goalBoard[2][1] = 8;
-    goalBoard[2][2] = 0;
-    if (board == solvedPuzzle){
+    vector<int> temp;
+    temp = {1, 2, 3};
+    goalBoard.push_back(temp);
+    temp = {4, 5, 6};
+    goalBoard.push_back(temp);
+    temp = {7, 8, 0};
+    goalBoard.push_back(temp);
+
+    if (board == goalBoard){
         return true;
     } else {
         return false;
@@ -40,15 +48,13 @@ int uniformSearch(vector<vector<int>> board){  //returning h(n) = 0
 int misplacedTileHeur(vector<vector<int>> board){ //returning h(n) based on wrong tile placement not including 0 (blank tile)
     int misplaced = 0;
     vector<vector<int>> goalBoard;
-    goalBoard[0][0] = 1;
-    goalBoard[0][1] = 2;
-    goalBoard[0][2] = 3;
-    goalBoard[1][0] = 4; // 1 2 3
-    goalBoard[1][1] = 5; // 4 5 6
-    goalBoard[1][2] = 6; // 7 8 0
-    goalBoard[2][0] = 7;
-    goalBoard[2][1] = 8;
-    goalBoard[2][2] = 0;
+    vector<int> temp;
+    temp = {1, 2, 3};
+    goalBoard.push_back(temp);
+    temp = {4, 5, 6};
+    goalBoard.push_back(temp);
+    temp = {7, 8, 0};
+    goalBoard.push_back(temp);
 
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 3; j++){
@@ -85,49 +91,49 @@ double euclideanDistanceHeur(vector<vector<int>> board){ //returning h(n) based 
                 else if (i == 2){xVal = 1;}
                 if (j == 0){yVal = 0;}
                 else if (j == 1){yVal = 1;}
-                else if (j == 2){yval = 2;}
+                else if (j == 2){yVal = 2;}
             } else if (board[i][j] == 3){
                 if (i == 0){xVal = 2;}
                 else if (i == 1){xVal = 1;}
                 else if (i == 2){xVal = 0;}
                 if (j == 0){yVal = 0;}
                 else if (j == 1){yVal = 1;}
-                else if (j == 2){yval = 2;}
+                else if (j == 2){yVal = 2;}
             } else if (board[i][j] == 4){
                 if (i == 0){xVal = 0;}
                 else if (i == 1){xVal = 1;}
                 else if (i == 2){xVal = 2;}
                 if (j == 0){yVal = 1;}
                 else if (j == 1){yVal = 0;}
-                else if (j == 2){yval = 1;}
+                else if (j == 2){yVal = 1;}
             } else if (board[i][j] == 5){
                 if (i == 0){xVal = 1;}
                 else if (i == 1){xVal = 0;}
                 else if (i == 2){xVal = 1;}
                 if (j == 0){yVal = 1;}
                 else if (j == 1){yVal = 0;}
-                else if (j == 2){yval = 1;}
+                else if (j == 2){yVal = 1;}
             } else if (board[i][j] == 6){
                 if (i == 0){xVal = 2;}
                 else if (i == 1){xVal = 1;}
                 else if (i == 2){xVal = 0;}
                 if (j == 0){yVal = 1;}
                 else if (j == 1){yVal = 0;}
-                else if (j == 2){yval = 1;}
+                else if (j == 2){yVal = 1;}
             } else if (board[i][j] == 7){
                 if (i == 0){xVal = 0;}
                 else if (i == 1){xVal = 1;}
                 else if (i == 2){xVal = 2;}
                 if (j == 0){yVal = 2;}
                 else if (j == 1){yVal = 1;}
-                else if (j == 2){yval = 0;}
+                else if (j == 2){yVal = 0;}
             } else if (board[i][j] == 8){
                 if (i == 0){xVal = 1;}
                 else if (i == 1){xVal = 0;}
                 else if (i == 2){xVal = 1;}
                 if (j == 0){yVal = 2;}
                 else if (j == 1){yVal = 1;}
-                else if (j == 2){yval = 0;}
+                else if (j == 2){yVal = 0;}
             }
             euclDist += sqrt((xVal*xVal) + (yVal*yVal)); //sqrt(x^2 + y^2)
         }
@@ -375,17 +381,20 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
     boardList.push_back(currNode->currState); //starting node in the explored list
     int zeroLoc;
     int tempLoc;
+    expandedNodes = 0;
 
     while (!frontier.empty()){
         zeroLoc = -1; //reset so we can look for the location of the blank slot (012345678)
         tempLoc = 0;
         currNode = frontier.top();
         frontier.pop();
+        printCurrent(currNode);
+        expandedNodes++;
         if (solvedPuzzle(currNode->currState)){printGoalState(currNode); break;}
         //expand nodes (find where the 0 {blank} is)
         for (int i = 0; i < 3; i++){
             for (int j = 0; j < 3; j++){
-                if (currNode[i][j] == 0){ zeroLoc = tempLoc; } 
+                if (currNode->currState[i][j] == 0){ zeroLoc = tempLoc; } 
                 else { tempLoc++; }
             }
         } //expand nodes (find where the 0 {blank} is)
@@ -483,102 +492,106 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
 }
 
 puzzleNode::puzzleNode(){
-    this.state = NULL;
-    this.parent = NULL;
-    this.child1 = NULL;
-    this.child2 = NULL;
-    this.child3 = NULL;
-    this.child4 = NULL;
-    this.cost = 0;
-    this.heurVal = 0;
+    this->currState;
+    this->parent = NULL;
+    this->child1 = NULL;
+    this->child2 = NULL;
+    this->child3 = NULL;
+    this->child4 = NULL;
+    this->cost = 0;
+    this->heurVal = 0;
 }
 
 puzzleNode::puzzleNode(vector<vector<int>> currState){
-    this.currState = currState;
-    this.parent = NULL;
-    this.child1 = NULL;
-    this.child2 = NULL;
-    this.child3 = NULL;
-    this.child4 = NULL;
-    this.cost = 0;
-    this.heurVal = 0;
+    this->currState = currState;
+    this->parent = NULL;
+    this->child1 = NULL;
+    this->child2 = NULL;
+    this->child3 = NULL;
+    this->child4 = NULL;
+    this->cost = 0;
+    this->heurVal = 0;
 }
 
 int main(){
     int puzzleType; //default or custom
     vector<vector<int>> board;
-    cout<< "Which puzzle would you like? (1 = default and 2 = custom)"; //Setting up puzzle board and choosing an algorithm [doesn't error check boards though]
-    cin>> puzzleType;
+    vector<int> temp;
+    cout<< "Which puzzle would you like? (1 = default and 2 = custom)\n"; //Setting up puzzle board and choosing an algorithm [doesn't error check boards though]
+    cin >> puzzleType;
     if (puzzleType == 1){
-        board[0][0] = 1; board[0][1] = 0; board[0][2] = 3;
-        board[1][0] = 4; board[1][1] = 2; board[1][2] = 6;
-        board[2][0] = 7; board[2][1] = 5; board[2][2] = 8;
+        temp = {1, 0, 3};
+        board.push_back(temp);
+        temp = {4, 2, 6};
+        board.push_back(temp);
+        temp = {7, 5, 8};
+        board.push_back(temp);
+        // board[0][0] = 1; 
+        // board[0][1] = 0; 
+        // board[0][2] = 3;
+        // board[1][0] = 4; 
+        // board[1][1] = 2; 
+        // board[1][2] = 6;
+        // board[2][0] = 7; 
+        // board[2][1] = 5; 
+        // board[2][2] = 8;
 
-        cout << "Your resulting board is: \n 1 0 3 \n 4 2 6 \n 7 5 8";
+        cout << "Your resulting board is: \n 1 0 3 \n 4 2 6 \n 7 5 8\n";
 
         int algo;
         int hVal;
-        cout << "Which algorithm would you like to run on the puzzle? 1 = Uniform Search\n 2 = A* Misplaced Tiles Search\n 3 = A* Euclidean Distance Search";
+        cout << "Which algorithm would you like to run on the puzzle?\n 1 = Uniform Search\n 2 = A* Misplaced Tiles Search\n 3 = A* Euclidean Distance Search\n";
         cin >> algo;
-        // if (algo == 1){
-        //     hVal = uniformSearch(board);
-        // } else if (algo == 2){
-        //     hVal = misplacedTileHeur(board);
-        // } else if (algo == 3){
-        //     hVal = euclideanDistanceHeur(board);
-        // }
+
 
         puzzleNode* initialBoard = new puzzleNode(board); //does it have to be a pointer?
-        performSearch(initialBoard, heurAlgo); //passes in the board with the chosen algorithm
+        performSearch(initialBoard, algo); //passes in the board with the chosen algorithm
         return 0;
 
     } else if (puzzleType == 2){
         int slot1, slot2, slot3;
-        cout << "Input your values for the first row. 0 represents the blank tile. Use values 1-8 only once each";
-        cout << "Use a space to separate the three first tiles (ex. 1 2 3)";
+        cout << "Input your values for the first row. 0 represents the blank tile. Use values 1-8 only once each\n";
+        cout << "Use a space to separate the three first tiles (ex. 1 2 3)\n";
         cin >> slot1;
         cin >> slot2;
         cin >> slot3;
-        board[0][0] = slot1; board[0][1] = slot2; board[0][2] = slot3;
-        
+        //board[0][0] = slot1; board[0][1] = slot2; board[0][2] = slot3;
+        temp = {slot1, slot2, slot3};
+        board.push_back(temp);
         cout << "Your current board is: \n" << slot1 << " " << slot2 << " " << slot3 << "\n"
                                             << "x x x \n"
-                                            << "x x x";
+                                            << "x x x\n";
         int slot4, slot5, slot6;
-        cout << "Input your values for the second row. "
+        cout << "Input your values for the second row.\n";
         cin >> slot4;
         cin >> slot5;
         cin >> slot6;
-        board[1][0] = slot4; board[1][1] = slot5; board[1][2] = slot6;
-
+        // board[1][0] = slot4; board[1][1] = slot5; board[1][2] = slot6;
+        temp = {slot4, slot5, slot6};
+        board.push_back(temp);
         cout << "Your current board is: \n" << slot1 << " " << slot2 << " " << slot3 << "\n"
                                             << slot4 << " " << slot5 << " " << slot6 << "\n"
-                                            << "x x x";
+                                            << "x x x\n";
         int slot7, slot8, slot9;
-        cout << "Input your values for the third row. "
+        cout << "Input your values for the third row. \n";
         cin >> slot7;
         cin >> slot8;
         cin >> slot9;
-        board[2][0] = slot7; board[2][1] = slot8; board[2][2] = slot9;
-
+        // board[2][0] = slot7; board[2][1] = slot8; board[2][2] = slot9;
+        temp = {slot7, slot8, slot9};
+        board.push_back(temp);
         cout << "Your resulting board is: \n" << slot1 << " " << slot2 << " " << slot3 << "\n"
                                             << slot4 << " " << slot5 << " " << slot6 << "\n"
-                                            << slot7 << " " << slot8 << " " << slot9;
+                                            << slot7 << " " << slot8 << " " << slot9 << "\n";
     
         int algo;
         int hVal;
-        cout << "Which algorithm would you like to run on the puzzle? 1 = Uniform Search\n 2 = A* Misplaced Tiles Search\n 3 = A* Euclidean Distance Search";
+        cout << "Which algorithm would you like to run on the puzzle?\n 1 = Uniform Search\n 2 = A* Misplaced Tiles Search\n 3 = A* Euclidean Distance Search\n";
         cin >> algo;
-        // if (algo == 1){
-        //     hVal = uniformSearch(board);
-        // } else if (algo == 2){
-        //     hVal = misplacedTileHeur(board);
-        // } else if (algo == 3){
-        //     hVal = euclideanDistanceHeur(board);
-        // }
+
 
         puzzleNode* initialBoard = new puzzleNode(board);
-        performSearch(initialBoard, heurAlgo); //passes in the board with its hVal
+        performSearch(initialBoard, algo); //passes in the board with its hVal
         return 0;
 
     }

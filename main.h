@@ -1,8 +1,14 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <queue>
+using namespace std;
+
 struct puzzleNode{ //represents a board sequence
     public:
         puzzleNode();
-        puzzleNode(state);
-        vector<vector<int>> currState = NULL; //represents the current state
+        puzzleNode(vector<vector<int>> state);
+        vector<vector<int>> currState; //represents the current state
         puzzleNode* parent = NULL; //represents the previous move 
         puzzleNode* child1 = NULL; //represents the possible moves: move blank up,left,right,down
         puzzleNode* child2 = NULL;
@@ -28,7 +34,7 @@ void performSearch(puzzleNode* rootPuzzle, int heurAlgo); //Best-first search
 int uniformSearch(vector<vector<int>> board); //returns h(n) = 0 
 int misplacedTileHeur(vector<vector<int>> board); //returns h(n) which counts the number of misplaced tiles
 double euclideanDistanceHeur(vector<vector<int>> board); //returns h(n) which is the Euclidean distance
-bool solvedPuzzle(vector<vector<int>> board));
+bool solvedPuzzle(vector<vector<int>> board);
 void printGoalState(puzzleNode* node);
 
 void topLeftMoves(puzzleNode* node); //pass in current Board and find possible moves from top row
@@ -40,4 +46,4 @@ void middleRightMoves(puzzleNode* node);
 void botLeftMoves(puzzleNode* node); //pass in current Board and find possible moves from bottom row
 void botMiddleMoves(puzzleNode* node);
 void botRightMoves(puzzleNode* node);
-
+void printCurrent(puzzleNode* node);
