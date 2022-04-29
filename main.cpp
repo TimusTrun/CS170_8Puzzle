@@ -369,12 +369,10 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
     if (hAlgo == 1){ currNode->heurVal = 0;}//calculating initial h(n) based off of the chosen algorithm
     else if (hAlgo == 2){ currNode->heurVal = misplacedTileHeur(currNode->currState); }
     else if (hAlgo == 3){ currNode->heurVal = euclideanDistanceHeur(currNode->currState); }
-    //currNode->heurVal = h; //assigning the h(n) val of the starting puzzleNode ****CHANGETHIS*****
-    vector<puzzleNode*> frontier; //used to store the frontier 
-    priority_queue<puzzleNode*, nodeList, reverseQueue> frontier; //nodelist????
+    priority_queue<puzzleNode*, vector<puzzleNode*>, reverseQueue> frontier; //nodelist????
     vector<vector<vector<int>>> boardList; //list of boards that have been expanded to already to makes sure we dont push boards that already occurred 
-    frontier.push_back(currNode); //priority queue pushes back the root
-    boardList.push(currNode->currState); //starting node in the explored list
+    frontier.push(currNode); //priority queue pushes back the root
+    boardList.push_back(currNode->currState); //starting node in the explored list
     int zeroLoc;
     int tempLoc;
 
@@ -443,8 +441,8 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
                 if (board == currNode->child1->currState) { exist1 = true; break;} //already discovered, just ignore this node
             }
             if (!exist1){ //board not discovered yet, add to frontier and list of discovered nodes
-                frontier.push_back(currNode->child1);
-                boardList.push(currNode->child1->currState);
+                frontier.push(currNode->child1);
+                boardList.push_back(currNode->child1->currState);
             }
         }
 
@@ -454,8 +452,8 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
                 if (board == currNode->child2->currState) { exist2 = true; break;} //already discovered, just ignore this node
             }
             if (!exist2){ //board not discovered yet, add to frontier and list of discovered nodes
-                frontier.push_back(currNode->child2);
-                boardList.push(currNode->child2->currState);
+                frontier.push(currNode->child2);
+                boardList.push_back(currNode->child2->currState);
             }
         }
 
@@ -465,8 +463,8 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
                 if (board == currNode->child3->currState) { exist3 = true; break;} //already discovered, just ignore this node
             }
             if (!exist3){ //board not discovered yet, add to frontier and list of discovered nodes
-                frontier.push_back(currNode->child3);
-                boardList.push(currNode->child3->currState);
+                frontier.push(currNode->child3);
+                boardList.push_back(currNode->child3->currState);
             }
         }
 
@@ -476,8 +474,8 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
                 if (board == currNode->child4->currState) { exist4 = true; break;} //already discovered, just ignore this node
             }
             if (!exist4){ //board not discovered yet, add to frontier and list of discovered nodes
-                frontier.push_back(currNode->child1);
-                boardList.push(currNode->child1->currState);
+                frontier.push(currNode->child1);
+                boardList.push_back(currNode->child1->currState);
             }
         }
         //Check children to see if they are already discovered, DONE
