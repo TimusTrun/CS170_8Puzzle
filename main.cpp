@@ -1,5 +1,6 @@
 #include "main.h"
-
+//TO DO: create solution path print function
+//TO DO: double check my Euclidean function and run it
 int expandedNodes = 0; //keeps track of the amount of puzzleNodes expanded
 
 void printGoalState(puzzleNode* node){
