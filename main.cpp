@@ -3,6 +3,35 @@ using namespace std;
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <queue>
+
+void printGoalState(puzzleNode* node){
+    cout<< "We found the goal state!";
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            cout << node->currState[i][j];
+        }
+        cout <<"\n";
+    }
+}
+
+bool solvedPuzzle(vector<vector<int>> board){
+    vector<vector<int>> goalBoard;
+    goalBoard[0][0] = 1;
+    goalBoard[0][1] = 2;
+    goalBoard[0][2] = 3;
+    goalBoard[1][0] = 4; // 1 2 3
+    goalBoard[1][1] = 5; // 4 5 6
+    goalBoard[1][2] = 6; // 7 8 0
+    goalBoard[2][0] = 7;
+    goalBoard[2][1] = 8;
+    goalBoard[2][2] = 0;
+    if (board == solvedPuzzle){
+        return true;
+    } else {
+        return false;
+    }
+}
 
 int uniformSearch(vector<vector<int>> board){  //returning h(n) = 0
     return 0; 
@@ -106,8 +135,284 @@ int euclideanDistanceHeur(vector<vector<int>> board){ //returning h(n) based on 
     return euclDist;
 }
 
-void performSearch(vector<vector<int>> board, double h){ //1 = uni, 2 = misplaced, 3 = euclidean, h = heuristic val
+void topLeftMoves(puzzleNode* node){
+    //at top left, the blank can move in 2 directions, make 2 children
+    // 0 1 2
+    // 3 4 5
+    // 6 7 8
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank down
+    child1->currState[0][0] = node->currState[1][0];
+    child1->currState[1][0] = node->currState[0][0];
+    child1->cost = node->cost + 1;
 
+    puzzleNode* child2 = new puzzleNode(node->currState); //move blank right
+    child2->currState[0][0] = node->currState[0][1];
+    child2->currState[0][1] = node->currState[0][0];
+    child2->cost = node->cost + 1;
+
+    //assign children to node's children pointers 1,2
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = NULL;
+    node->child4 = NULL;
+} 
+void topMiddleMoves(puzzleNode* node){
+    //at top middle, the blank can move in 3 directions, make 3 children
+    // 1 0 2
+    // 3 4 5
+    // 6 7 8
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank left
+    child1->currState[0][0] = node->currState[0][1];
+    child1->currState[0][1] = node->currState[0][0];
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move down
+    child2->currState[1][1] = node->currState[0][1];
+    child2->currState[0][1] = node->currState[1][1];
+    child2->cost = node->cost + 1;
+
+    puzzleNode* child3 = new puzzleNode(node->currState); //move right
+    child3->currState[0][1] = node->currState[0][2];
+    child3->currState[0][2] = node->currState[0][1];
+    child3->cost = node->cost + 1;
+
+    //assign children to node's children pointers 1,2,3
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = child3;
+    node->child4 = NULL;
+
+}
+void topRightMoves(puzzleNode* node){
+    //at top right, the blank can move in 2 directions, make 2 children
+    // 1 2 0
+    // 3 4 5
+    // 6 7 8
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank left
+    child1->currState[0][1] = node->currState[0][2];
+    child1->currState[0][2] = node->currState[0][1];
+    child1->cost += 1;
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move blank down
+    child2->currState[0][2] = node->currState[1][2];
+    child2->currState[1][2] = node->currState[0][2];
+    child2->cost += 1;
+    child2->cost = node->cost + 1;
+
+    //assign children to node's children pointers 1,2
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = NULL;
+    node->child4 = NULL;
+}
+void middleLeftMoves(puzzleNode* node){
+    //at middle left, the blank can move in 3 directions, make 3 children
+    // 3 1 2
+    // 0 4 5
+    // 6 7 8
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank up
+    child1->currState[0][0] = node->currState[1][0];
+    child1->currState[1][0] = node->currState[0][0];
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move right
+    child2->currState[1][1] = node->currState[0][1];
+    child2->currState[0][1] = node->currState[1][1];
+    child2->cost = node->cost + 1;
+
+    puzzleNode* child3 = new puzzleNode(node->currState); //move down
+    child3->currState[0][1] = node->currState[0][2];
+    child3->currState[0][2] = node->currState[0][1];
+    child3->cost = node->cost + 1;
+
+    //assign children 1 2 3
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = child3;
+    node->child4 = NULL;
+
+}
+void middleMiddleMoves(puzzleNode* node){
+    //at top left, the blank can move in 4 directions, make 4 children
+    // 4 1 2
+    // 3 0 5
+    // 6 7 8
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank left
+    child1->currState[1][0] = node->currState[1][1];
+    child1->currState[1][1] = node->currState[1][0];
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move up
+    child2->currState[1][1] = node->currState[0][1];
+    child2->currState[0][1] = node->currState[1][1];
+    child2->cost = node->cost + 1;
+
+    puzzleNode* child3 = new puzzleNode(node->currState); //move right
+    child3->currState[1][1] = node->currState[1][2];
+    child3->currState[1][2] = node->currState[1][1];
+    child3->cost = node->cost + 1;
+
+    puzzleNode* child4 = new puzzleNode(node->currState); //move down
+    child4->currState[2][1] = node->currState[1][1];
+    child4->currState[1][1] = node->currState[2][1];
+    child4->cost = node->cost + 1;
+
+    //assign children 1,2,3,4
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = child3;
+    node->child4 = child4;
+
+}
+void middleRightMoves(puzzleNode* node){
+    //at middle right, the blank can move in 3 directions, make 3 children
+    // 5 1 2
+    // 3 4 0
+    // 6 7 8
+
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank left
+    child1->currState[1][1] = node->currState[1][2];
+    child1->currState[1][2] = node->currState[1][1];
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move up
+    child2->currState[1][2] = node->currState[0][2];
+    child2->currState[0][2] = node->currState[1][2];
+    child2->cost = node->cost + 1;
+
+    puzzleNode* child3 = new puzzleNode(node->currState); //move down
+    child3->currState[2][2] = node->currState[1][2];
+    child3->currState[1][2] = node->currState[2][2];
+    child3->cost = node->cost + 1;
+
+    //assign children 1 2 3
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = child3;
+    node->child4 = NULL; 
+
+}
+void botLeftMoves(puzzleNode* node){
+    //at bot left, the blank can move in 2 directions, make 2 children
+    // 6 1 2
+    // 3 4 5
+    // 0 7 8
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank up
+    child1->currState[1][0] = node->currState[2][0];
+    child1->currState[2][0] = node->currState[1][0];
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move right
+    child2->currState[2][0] = node->currState[2][1];
+    child2->currState[2][1] = node->currState[2][0];
+    child2->cost = node->cost + 1;
+
+    //assign children 1 2
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = NULL;
+    node->child4 = NULL;
+
+}
+void botMiddleMoves(puzzleNode* node){
+    //at bot middle, the blank can move in 3 directions, make 3 children
+    // 6 1 2
+    // 3 4 5
+    // 7 0 8
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank left
+    child1->currState[2][0] = node->currState[2][1];
+    child1->currState[2][1] = node->currState[2][0];
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move up
+    child2->currState[1][1] = node->currState[2][1];
+    child2->currState[2][1] = node->currState[1][1];
+    child2->cost = node->cost + 1;
+
+    puzzleNode* child3 = new puzzleNode(node->currState); //move right
+    child3->currState[2][2] = node->currState[2][1];
+    child3->currState[2][1] = node->currState[2][2];
+    child3->cost = node->cost + 1;
+
+    //assign children 1 2 3
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = child3;
+    node->child4 = NULL;
+
+}
+void botRightMoves(puzzleNode* node){
+    //at bot right, the blank can move in 2 directions, make 2 children
+    // 6 1 2
+    // 3 4 5
+    // 8 7 0
+    puzzleNode* child1 = new puzzleNode(node->currState); //move blank left
+    child1->currState[2][1] = node->currState[2][2];
+    child1->currState[2][2] = node->currState[2][1];
+    child1->cost = node->cost + 1;
+
+    puzzleNode* child2 = new puzzleNode(node->currState); //move up
+    child2->currState[2][2] = node->currState[1][2];
+    child2->currState[1][2] = node->currState[2][2];
+    child2->cost = node->cost + 1;
+
+    //assign children 1 2
+    node->child1 = child1;
+    node->child2 = child2;
+    node->child3 = NULL;
+    node->child4 = NULL;
+}
+
+void performSearch(puzzleNode* rootPuzzle, double h){ //1 = uni, 2 = misplaced, 3 = euclidean, h = heuristic val
+    puzzleNode* currNode = rootPuzzle; //node <- Node(state = problem.initial)
+    currNode->heurVal = h; //assigning the h(n) val of the starting puzzleNode
+    vector<puzzleNode*> frontier; //used to store the frontier 
+    priority_queue<puzzleNode*, nodeList, reverseQueue> frontier;
+    vector<vector<vector<int>>> boardList; //list of boards that have been expanded to already to makes sure we dont push boards that already occurred 
+    frontier.push_back(currNode); //priority queue pushes back the root
+    boardList.push(currNode); //starting node in the explored list
+    int zeroLoc;
+    int tempLoc;
+
+    while (!frontier.empty()){
+        zeroLoc = -1; //reset so we can look for the location of the blank slot (012345678)
+        tempLoc = 0;
+        currNode = frontier.top();
+        frontier.pop();
+        if (solvedPuzzle(currNode->currState)){printGoalState(currNode); break;}
+        //expand nodes (find where the 0 {blank} is)
+        for (int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++){
+                if (currNode[i][j] == 0){ zeroLoc = tempLoc; } 
+                else { tempLoc++; }
+            }
+        } //expand nodes (find where the 0 {blank} is)
+        //now expand based on 0 location
+        if (zeroLoc == 0){
+            topLeftMoves(currNode);
+        } else if (zeroLoc == 1){
+            topMiddleMoves(currNode);
+        } else if (zeroLoc == 2){
+            topRightMoves(currNode);
+        } else if (zeroLoc == 3){
+            middleLeftMoves(currNode);
+        } else if (zeroLoc == 4){
+            middleMiddleMoves(currNode);
+        } else if (zeroLoc == 5){
+            middleRightMoves(currNode);
+        } else if (zeroLoc == 6){
+            botLeftMoves(currNode);
+        } else if (zeroLoc == 7){
+            botMiddleMoves(currNode);
+        } else if (zeroLoc == 8){
+            botRightMoves(currNode);
+        } else if (zeroLoc >= 9 || zeroLoc ==-1){
+            cout << "The board is not valid!";
+            break;
+        } //now expand based on 0 location
+        
+    }
 }
 
 puzzleNode::puzzleNode(){
@@ -117,8 +422,8 @@ puzzleNode::puzzleNode(){
     this.child2 = NULL;
     this.child3 = NULL;
     this.child4 = NULL;
-    this.depth = 0;
     this.cost = 0;
+    this.heurVal = 0;
 }
 
 puzzleNode::puzzleNode(vector<vector<int>> currState){
@@ -128,8 +433,8 @@ puzzleNode::puzzleNode(vector<vector<int>> currState){
     this.child2 = NULL;
     this.child3 = NULL;
     this.child4 = NULL;
-    this.depth = 0;
     this.cost = 0;
+    this.heurVal = 0;
 }
 
 int main(){
@@ -156,7 +461,7 @@ int main(){
             hVal = euclideanDistanceHeur(board);
         }
 
-        puzzleNode* initialBoard = new puzzleNode(board);
+        puzzleNode* initialBoard = new puzzleNode(board); //does it have to be a pointer?
         performSearch(initialBoard, hVal); //passes in the board with its hVal
         return 0;
 
@@ -205,7 +510,7 @@ int main(){
             hVal = euclideanDistanceHeur(board);
         }
 
-        puzzleNode initialBoard = new puzzleNode(board);
+        puzzleNode* initialBoard = new puzzleNode(board);
         performSearch(initialBoard, hVal); //passes in the board with its hVal
         return 0;
 
