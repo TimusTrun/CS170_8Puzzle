@@ -9,7 +9,7 @@ struct puzzleNode{ //represents a board sequence
         puzzleNode* child3 = NULL;
         puzzleNode* child4 = NULL;
         int cost = 0; //cost same as depth
-        int heurVal = 0;
+        double heurVal = 0;
 
 };
 
@@ -24,10 +24,10 @@ class reverseQueue { //used to make a priority queue reversed [lowest value prio
         }
 };
 
-void performSearch(puzzleNode* rootPuzzle, double h); //Best-first search
+void performSearch(puzzleNode* rootPuzzle, int heurAlgo); //Best-first search
 int uniformSearch(vector<vector<int>> board); //returns h(n) = 0 
 int misplacedTileHeur(vector<vector<int>> board); //returns h(n) which counts the number of misplaced tiles
-int euclideanDistanceHeur(vector<vector<int>> board); //returns h(n) which is the Euclidean distance
+double euclideanDistanceHeur(vector<vector<int>> board); //returns h(n) which is the Euclidean distance
 bool solvedPuzzle(vector<vector<int>> board));
 void printGoalState(puzzleNode* node);
 

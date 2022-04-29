@@ -64,7 +64,7 @@ int misplacedTileHeur(vector<vector<int>> board){ //returning h(n) based on wron
     return misplaced; //h(n) for misplaced tiles
 }
 
-int euclideanDistanceHeur(vector<vector<int>> board){ //returning h(n) based on euclidean distance
+double euclideanDistanceHeur(vector<vector<int>> board){ //returning h(n) based on euclidean distance
     int xVal;
     int yVal;
     double euclDist;
@@ -364,14 +364,17 @@ void botRightMoves(puzzleNode* node){
     node->child4 = NULL;
 }
 
-void performSearch(puzzleNode* rootPuzzle, double h){ //1 = uni, 2 = misplaced, 3 = euclidean, h = heuristic val
+void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced, 3 = euclidean, h = heuristic val
     puzzleNode* currNode = rootPuzzle; //node <- Node(state = problem.initial)
-    currNode->heurVal = h; //assigning the h(n) val of the starting puzzleNode
+    if (hAlgo == 1){ currNode->heurVal = 0;}//calculating initial h(n) based off of the chosen algorithm
+    else if (hAlgo == 2){ currNode->heurVal = misplacedTileHeur(currNode->currState); }
+    else if (hAlgo == 3){ currNode->heurVal = euclideanDistanceHeur(currNode->currState); }
+    //currNode->heurVal = h; //assigning the h(n) val of the starting puzzleNode ****CHANGETHIS*****
     vector<puzzleNode*> frontier; //used to store the frontier 
-    priority_queue<puzzleNode*, nodeList, reverseQueue> frontier;
+    priority_queue<puzzleNode*, nodeList, reverseQueue> frontier; //nodelist????
     vector<vector<vector<int>>> boardList; //list of boards that have been expanded to already to makes sure we dont push boards that already occurred 
     frontier.push_back(currNode); //priority queue pushes back the root
-    boardList.push(currNode); //starting node in the explored list
+    boardList.push(currNode->currState); //starting node in the explored list
     int zeroLoc;
     int tempLoc;
 
@@ -388,7 +391,7 @@ void performSearch(puzzleNode* rootPuzzle, double h){ //1 = uni, 2 = misplaced, 
                 else { tempLoc++; }
             }
         } //expand nodes (find where the 0 {blank} is)
-        //now expand based on 0 location
+        //now expand based on 0 location and give children heuristic values
         if (zeroLoc == 0){
             topLeftMoves(currNode);
         } else if (zeroLoc == 1){
@@ -410,8 +413,74 @@ void performSearch(puzzleNode* rootPuzzle, double h){ //1 = uni, 2 = misplaced, 
         } else if (zeroLoc >= 9 || zeroLoc ==-1){
             cout << "The board is not valid!";
             break;
-        } //now expand based on 0 location
-        
+        } //now expand based on 0 location and give children heuristic values
+        if(currNode->child1 != NULL){ //check which childrens exist and assign a heur value to them
+            if(hAlgo == 1){currNode->child1->heurVal = uniformSearch(currNode->child1->currState);}
+            else if (hAlgo == 2){currNode->child1->heurVal = misplacedTileHeur(currNode->child1->currState);}
+            else if (hAlgo == 3){currNode->child1->heurVal = euclideanDistanceHeur(currNode->child1->currState);}
+        }
+        if(currNode->child2 != NULL){
+            if(hAlgo == 1){currNode->child2->heurVal = uniformSearch(currNode->child2->currState);}
+            else if (hAlgo == 2){currNode->child2->heurVal = misplacedTileHeur(currNode->child2->currState);}
+            else if (hAlgo == 3){currNode->child2->heurVal = euclideanDistanceHeur(currNode->child2->currState);}  
+        }
+        if(currNode->child3 != NULL){
+            if(hAlgo == 1){currNode->child3->heurVal = uniformSearch(currNode->child3->currState);}
+            else if (hAlgo == 2){currNode->child3->heurVal = misplacedTileHeur(currNode->child3->currState);}
+            else if (hAlgo == 3){currNode->child3->heurVal = euclideanDistanceHeur(currNode->child3->currState);}
+        }
+        if(currNode->child4 != NULL){
+            if(hAlgo == 1){currNode->child4->heurVal = uniformSearch(currNode->child4->currState);}
+            else if (hAlgo == 2){currNode->child4->heurVal = misplacedTileHeur(currNode->child4->currState);}
+            else if (hAlgo == 3){currNode->child4->heurVal = euclideanDistanceHeur(currNode->child4->currState);}
+        }  //check which childrens exist and assign a heur value to them
+
+        //Check children to see if they are already discovered, if already discovered: dont do anything
+        //                                                      if not already discovered: add to frontier, and discovered list
+        if (currNode->child1 != NULL){ //child 1 check if exists
+            bool exist1 = false; //doesnt exists yet
+            for (vector<vector<int>> board : boardList){
+                if (board == currNode->child1->currState) { exist1 = true; break;} //already discovered, just ignore this node
+            }
+            if (!exist1){ //board not discovered yet, add to frontier and list of discovered nodes
+                frontier.push_back(currNode->child1);
+                boardList.push(currNode->child1->currState);
+            }
+        }
+
+        if (currNode->child2 != NULL){ //child 2 check if exists
+            bool exist2 = false; //doesnt exists yet
+            for (vector<vector<int>> board : boardList){
+                if (board == currNode->child2->currState) { exist2 = true; break;} //already discovered, just ignore this node
+            }
+            if (!exist2){ //board not discovered yet, add to frontier and list of discovered nodes
+                frontier.push_back(currNode->child2);
+                boardList.push(currNode->child2->currState);
+            }
+        }
+
+        if (currNode->child3 != NULL){ //child 3 check if exists
+            bool exist3 = false; //doesnt exists yet
+            for (vector<vector<int>> board : boardList){
+                if (board == currNode->child3->currState) { exist3 = true; break;} //already discovered, just ignore this node
+            }
+            if (!exist3){ //board not discovered yet, add to frontier and list of discovered nodes
+                frontier.push_back(currNode->child3);
+                boardList.push(currNode->child3->currState);
+            }
+        }
+
+        if (currNode->child4 != NULL){ //child 4 check if exists
+            bool exist4 = false; //doesnt exists yet
+            for (vector<vector<int>> board : boardList){
+                if (board == currNode->child4->currState) { exist4 = true; break;} //already discovered, just ignore this node
+            }
+            if (!exist4){ //board not discovered yet, add to frontier and list of discovered nodes
+                frontier.push_back(currNode->child1);
+                boardList.push(currNode->child1->currState);
+            }
+        }
+        //Check children to see if they are already discovered, DONE
     }
 }
 
@@ -453,16 +522,16 @@ int main(){
         int hVal;
         cout << "Which algorithm would you like to run on the puzzle? 1 = Uniform Search\n 2 = A* Misplaced Tiles Search\n 3 = A* Euclidean Distance Search";
         cin >> algo;
-        if (algo == 1){
-            hVal = uniformSearch(board);
-        } else if (algo == 2){
-            hVal = misplacedTileHeur(board);
-        } else if (algo == 3){
-            hVal = euclideanDistanceHeur(board);
-        }
+        // if (algo == 1){
+        //     hVal = uniformSearch(board);
+        // } else if (algo == 2){
+        //     hVal = misplacedTileHeur(board);
+        // } else if (algo == 3){
+        //     hVal = euclideanDistanceHeur(board);
+        // }
 
         puzzleNode* initialBoard = new puzzleNode(board); //does it have to be a pointer?
-        performSearch(initialBoard, hVal); //passes in the board with its hVal
+        performSearch(initialBoard, heurAlgo); //passes in the board with the chosen algorithm
         return 0;
 
     } else if (puzzleType == 2){
@@ -502,16 +571,16 @@ int main(){
         int hVal;
         cout << "Which algorithm would you like to run on the puzzle? 1 = Uniform Search\n 2 = A* Misplaced Tiles Search\n 3 = A* Euclidean Distance Search";
         cin >> algo;
-        if (algo == 1){
-            hVal = uniformSearch(board);
-        } else if (algo == 2){
-            hVal = misplacedTileHeur(board);
-        } else if (algo == 3){
-            hVal = euclideanDistanceHeur(board);
-        }
+        // if (algo == 1){
+        //     hVal = uniformSearch(board);
+        // } else if (algo == 2){
+        //     hVal = misplacedTileHeur(board);
+        // } else if (algo == 3){
+        //     hVal = euclideanDistanceHeur(board);
+        // }
 
         puzzleNode* initialBoard = new puzzleNode(board);
-        performSearch(initialBoard, hVal); //passes in the board with its hVal
+        performSearch(initialBoard, heurAlgo); //passes in the board with its hVal
         return 0;
 
     }
