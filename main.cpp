@@ -1,11 +1,12 @@
 #include "main.h"
-//TO DO: create solution path print function
 //TO DO: double check my Euclidean function and run it
 int expandedNodes = 0; //keeps track of the amount of puzzleNodes expanded
+int maxQSize = 0; //refers to maximum size of the frontier
 
 void printGoalState(puzzleNode* node){
     cout<< "\nWe found the goal state!\nThe depth is " << node->cost << "!\n";
     cout<< "We also expanded " << expandedNodes << " nodes!\n";
+    cout<< "The max queue size was " << maxQSize << "!\n";
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 3; j++){
             cout << node->currState[i][j];
@@ -72,69 +73,71 @@ int misplacedTileHeur(vector<vector<int>> board){ //returning h(n) based on wron
 }
 
 double euclideanDistanceHeur(vector<vector<int>> board){ //returning h(n) based on euclidean distance
-    int xVal;
-    int yVal;
-    double euclDist;
+    int xVal = 0;
+    int yVal = 0;
+    double euclDist = 0;
     for (int i = 0; i < 3; i++){ //row
         for (int j = 0; j < 3; j++){ //column
             if (board[i][j] == 0){ //dont count blank spot
+                xVal = 0;
+                yVal = 0;
                 euclDist += 0; 
             } else if (board[i][j] == 1){
-                if (i == 0){xVal = 0;} //calculating how many moves in x-dir
-                else if (i == 1){xVal = 1;}
-                else if (i == 2){xVal = 2;}
-                if (j == 0){yVal = 0;}
-                else if (j == 1){yVal = 1;}
-                else if (j == 2){yVal = 2;}
+                if (i == 0){yVal = 0;} //calculating how many moves in x-dir
+                else if (i == 1){yVal = 1;}
+                else if (i == 2){yVal = 2;}
+                if (j == 0){xVal = 0;}
+                else if (j == 1){xVal = 1;}
+                else if (j == 2){xVal = 2;}
             } else if (board[i][j] == 2){
-                if (i == 0){xVal = 1;}
-                else if (i == 1){xVal = 0;}
-                else if (i == 2){xVal = 1;}
-                if (j == 0){yVal = 0;}
-                else if (j == 1){yVal = 1;}
-                else if (j == 2){yVal = 2;}
+                if (i == 0){yVal = 0;}
+                else if (i == 1){yVal = 1;}
+                else if (i == 2){yVal = 2;}
+                if (j == 0){xVal = 1;}
+                else if (j == 1){xVal = 0;}
+                else if (j == 2){xVal = 1;}
             } else if (board[i][j] == 3){
-                if (i == 0){xVal = 2;}
-                else if (i == 1){xVal = 1;}
-                else if (i == 2){xVal = 0;}
-                if (j == 0){yVal = 0;}
-                else if (j == 1){yVal = 1;}
-                else if (j == 2){yVal = 2;}
+                if (i == 0){yVal = 0;}
+                else if (i == 1){yVal = 1;}
+                else if (i == 2){yVal = 2;}
+                if (j == 0){xVal = 2;}
+                else if (j == 1){xVal = 1;}
+                else if (j == 2){xVal = 0;}
             } else if (board[i][j] == 4){
-                if (i == 0){xVal = 0;}
-                else if (i == 1){xVal = 1;}
-                else if (i == 2){xVal = 2;}
-                if (j == 0){yVal = 1;}
-                else if (j == 1){yVal = 0;}
-                else if (j == 2){yVal = 1;}
+                if (i == 0){yVal = 1;}
+                else if (i == 1){yVal = 0;}
+                else if (i == 2){yVal = 1;}
+                if (j == 0){xVal = 0;}
+                else if (j == 1){xVal = 1;}
+                else if (j == 2){xVal = 2;}
             } else if (board[i][j] == 5){
-                if (i == 0){xVal = 1;}
-                else if (i == 1){xVal = 0;}
-                else if (i == 2){xVal = 1;}
-                if (j == 0){yVal = 1;}
-                else if (j == 1){yVal = 0;}
-                else if (j == 2){yVal = 1;}
+                if (i == 0){yVal = 1;}
+                else if (i == 1){yVal = 0;}
+                else if (i == 2){yVal = 1;}
+                if (j == 0){xVal = 1;}
+                else if (j == 1){xVal = 0;}
+                else if (j == 2){xVal = 1;}
             } else if (board[i][j] == 6){
-                if (i == 0){xVal = 2;}
-                else if (i == 1){xVal = 1;}
-                else if (i == 2){xVal = 0;}
-                if (j == 0){yVal = 1;}
-                else if (j == 1){yVal = 0;}
-                else if (j == 2){yVal = 1;}
+                if (i == 0){yVal = 1;}
+                else if (i == 1){yVal = 0;}
+                else if (i == 2){yVal = 1;}
+                if (j == 0){xVal = 2;}
+                else if (j == 1){xVal = 1;}
+                else if (j == 2){xVal = 0;}
             } else if (board[i][j] == 7){
-                if (i == 0){xVal = 0;}
-                else if (i == 1){xVal = 1;}
-                else if (i == 2){xVal = 2;}
-                if (j == 0){yVal = 2;}
-                else if (j == 1){yVal = 1;}
-                else if (j == 2){yVal = 0;}
+                if (i == 0){yVal = 2;}
+                else if (i == 1){yVal = 1;}
+                else if (i == 2){yVal = 0;}
+                if (j == 0){xVal = 0;}
+                else if (j == 1){xVal = 1;}
+                else if (j == 2){xVal = 2;}
             } else if (board[i][j] == 8){
-                if (i == 0){xVal = 1;}
-                else if (i == 1){xVal = 0;}
-                else if (i == 2){xVal = 1;}
-                if (j == 0){yVal = 2;}
-                else if (j == 1){yVal = 1;}
-                else if (j == 2){yVal = 0;}
+                if (i == 0){yVal = 2;}
+                else if (i == 1){yVal = 1;}
+                else if (i == 2){yVal = 0;}
+                if (j == 0){xVal = 1;}
+                else if (j == 1){xVal = 0;}
+                else if (j == 2){xVal = 1;}
             }
             euclDist += sqrt((xVal*xVal) + (yVal*yVal)); //sqrt(x^2 + y^2)
         }
@@ -379,6 +382,7 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
     priority_queue<puzzleNode*, vector<puzzleNode*>, reverseQueue> frontier; //nodelist????
     vector<vector<vector<int>>> boardList; //list of boards that have been expanded to already to makes sure we dont push boards that already occurred 
     frontier.push(currNode); //priority queue pushes back the root
+    maxQSize = frontier.size();
     boardList.push_back(currNode->currState); //starting node in the explored list
     int zeroLoc;
     int tempLoc;
@@ -452,6 +456,9 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
             }
             if (!exist1){ //board not discovered yet, add to frontier and list of discovered nodes
                 frontier.push(currNode->child1);
+                if(frontier.size() > maxQSize){
+                    maxQSize = frontier.size();
+                }
                 boardList.push_back(currNode->child1->currState);
             }
         }
@@ -463,6 +470,9 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
             }
             if (!exist2){ //board not discovered yet, add to frontier and list of discovered nodes
                 frontier.push(currNode->child2);
+                if(frontier.size() > maxQSize){
+                    maxQSize = frontier.size();
+                }
                 boardList.push_back(currNode->child2->currState);
             }
         }
@@ -474,6 +484,9 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
             }
             if (!exist3){ //board not discovered yet, add to frontier and list of discovered nodes
                 frontier.push(currNode->child3);
+                if(frontier.size() > maxQSize){
+                    maxQSize = frontier.size();
+                }
                 boardList.push_back(currNode->child3->currState);
             }
         }
@@ -484,8 +497,11 @@ void performSearch(puzzleNode* rootPuzzle, int hAlgo){ //1 = uni, 2 = misplaced,
                 if (board == currNode->child4->currState) { exist4 = true; break;} //already discovered, just ignore this node
             }
             if (!exist4){ //board not discovered yet, add to frontier and list of discovered nodes
-                frontier.push(currNode->child1);
-                boardList.push_back(currNode->child1->currState);
+                frontier.push(currNode->child4);
+                if(frontier.size() > maxQSize){
+                    maxQSize = frontier.size();
+                }
+                boardList.push_back(currNode->child4->currState);
             }
         }
         //Check children to see if they are already discovered, DONE
